@@ -40,16 +40,9 @@ In this paper an experimental setup is described in which a pendulum with a reac
 The setup consists of a 3D-printed model see figure \ref{fig:3d ontwerp}, with a pendulum on a stand that can be clamped to a table. The pendulum arm is 55 mm long, measured from the center of the pivot point to the center of the reaction wheel. An MPU6050 is attached to the arm, which can read the angle of the pendulum. At the top of the pendulum is a 3-phase 2804 100kv BLDC motor. Connected to this motor is an reaction wheel with a radius of 50 mm. To see the motor's position for better control, there is a magnet in the motor shaft, which an AS5600 sensor can read to find the angle of the motor.
 To control the entire system, an Arduino Nano is used, and a motor driver is employed to send high power levels to the motor.
 
-% \begin{Figure}
-% \begin{center}
-% \includegraphics[width=0.595\linewidth]{Pendulum v13 voor.png}
-% % \caption{Foto van een gekko}
-% \end{center}
-% \end{Figure}
-
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.35]{Pendulum}
+\includegraphics[scale=0.42]{Pendulum v13 schuin}
 \caption{Ontwerp van het 3d model}
 \label{fig:3d ontwerp}
 \end{figure}
@@ -94,7 +87,7 @@ I_{\text{rw}} \cdot \dot{\omega}_{\text{rw}} = \tau_{\text{rw}}
 Where:
 \begin{align*}
 &I_{\text{rw}} \text{ is the moment of inertia of the reaction wheel,} \\
-&\dot{\omega}_{\text{rw}} \text{ is the angular velocity of the reaction wheel,} \\
+&\dot{\omega}_{\text{rw}} \text{ is the angular acceleration of the reaction wheel,} \\
 &\tau_{\text{rw}} \text{ is the torque applied by the reaction wheel.}
 \end{align*}
 
@@ -129,7 +122,17 @@ See appendix B for the implementation in python.
 
 \subsection{Control:}
 
-In my simulation, I used PID control. This technique first calculates the error (setpoint - current output) of the system, and then a control output is computed based on proportional (Kp), integral (Ki), and derivative (Kd) gains. By tuning these values, the system can be made more or less stable.
+In my simulation, I used PID control. 
+This technique first calculates the error (setpoint - current output) of the system, and then a control output is computed based on proportional (Kp), integral (Ki), and derivative (Kd) gains. 
+By tuning these values, the system can be made more or less stable.
+The values I used for the PID controller were:
+\begin{align*}
+\text{ Kp = 1.40}\\
+\text{ Ki = 0.01}\\
+\text{ Kd = 3.60}
+\end{align*}
+
+
 
 The control output of the PID will be used to drive the motor, resulting in torque from the reaction wheel that, in turn, affects the acceleration of the pendulum. This allows the control over the system.
 
@@ -140,7 +143,7 @@ For the simulation of the system, I referred to an article by Korn, Nopparuj, Pa
 \begin{figure}[H]
 \centering
 \includegraphics[scale=1.5]{simulatie foto}
-\caption{Graphic Simulation}
+\caption{Here is how the Python simulation looks.}
 \label{fig:Graphic Simulation}
 \end{figure}
 
@@ -149,19 +152,19 @@ In figure \ref{fig:Stepresponse PID controlled simulation Michel} and \ref{fig:S
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.37]{Stepresponse Michel}
-\caption{Stepresponse PID controlled simulation Michel.}
+\caption{Stepresponse PID controlled simulation programmed by Michel.}
 \label{fig:Stepresponse PID controlled simulation Michel}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.37]{Stepresponse FIBO}
-\caption{Stepresponse PID controlled simulation FIBO.}
+\caption{Stepresponse PID controlled simulation programmed by the FIBO.}
 \label{fig:Stepresponse PID controlled simulation FIBO}
 \end{figure}
 
 
-The interesting aspect of the FIBO article is that they have also conducted calculations for an LQR simulation. In figure \ref{fig:Stepresponse LQR controlled simulation FIBO}, you can observe the simulation where an additional external force is applied to the end of the pendulum. It's clearly visible from the simulation that the system responds much better with LQR control.
+The interesting aspect of the FIBO article is that they have also conducted calculations for an LQR simulation. In figure \ref{fig:Stepresponse LQR controlled simulation FIBO}, you can observe the simulation where an additional external force is applied to the end of the pendulum. In figure \ref{fig:Stepresponse LQR controlled simulation FIBO}, you can observe how the model responds to an external force with LQR control compared to PID control, as depicted in figure \ref{fig:Stepresponse PID controlled simulation Michel} and \ref{fig:Stepresponse PID controlled simulation FIBO}. It is clearly visible that with LQR, the pendulum quickly returns to its setpoint without the need for significant oscillations before reaching the desired position.
 
 \begin{figure}[H]
 \centering
@@ -170,6 +173,19 @@ The interesting aspect of the FIBO article is that they have also conducted calc
 \label{fig:Stepresponse LQR controlled simulation FIBO}
 \end{figure}
 
+
+LQR stands for Linear Quadratic Regulator, and it is a control algorithm used in the field of control theory to design controllers for linear dynamic systems. LQR aims to minimize a quadratic cost function that represents the trade-off between control effort and system performance.
+
+The key components of an LQR controller include:
+\begin{enumerate}
+    \item State-space representation: The dynamic behavior of a system is described using state-space equations. These equations represent how the state variables of the system change over time.
+    \item Cost function: LQR formulates a cost function that involves the weighted sum of the state variables and control inputs. The goal is to find control inputs that minimize this cost function.
+    \item Weighting matrices: LQR uses weighting matrices to assign importance to different components of the cost function. The choice of these matrices influences the balance between achieving good system performance and minimizing control effort.
+    \item Optimization: The LQR algorithm involves solving a matrix Riccati differential equation to find the optimal state feedback matrix. This matrix determines how the control input is computed based on the current state of the system.
+\end{enumerate}
+
+The resulting LQR controller provides a linear feedback law that is often represented as a linear combination of the state variables. This feedback control law aims to stabilize the system and optimize its performance according to the specified cost function.
+
 \section{Physical setup}
 At the beginning of this project, the intention was to create a relatively small and compact model of a balancing pendulum using a reaction wheel, allowing for easy transportation and demonstrations in various locations. Unfortunately, this has resulted in nothing more than numerous lessons. Due to the relatively small size of the model, it requires a high level of precision, which is not achievable with the current hardware.
 
@@ -177,17 +193,17 @@ In figure \ref{fig:Phisical setup}, you can see the model in real life. The plan
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.05, angle =-90 ]{20240114_155939}
+\includegraphics[scale=0.040, angle =-90 ]{20240114_155939}
 \caption{Phisical setup.}
 \label{fig:Phisical setup}
 \end{figure}
 
-Firstly, the gyro sensor that measures the angle of the pendulum. In the graph in figure \ref{fig:measurements gyro sensor}, you can see what the sensor measures. The deviation from the actual angle is too significant for this level of precision (up to a maximum of 2.75 degrees). However, an actual reading of the angle is crucial. If the PID controller has a delay of 2 degrees, it becomes extremely difficult to correct this.
+Firstly, the gyro sensor that measures the angle of the pendulum. In the graph in figure \ref{fig:measurements gyro sensor}, you can see what the sensor measures. The deviation from the actual angle is too significant for this level of precision (up to a maximum of 2.75 degrees). However, an actual reading of the angle is crucial. If the actual angle of the pendulum is 0 degrees and the sensor reads 2 degrees, it will self-tilt. In a model like this, precision is crucial, where a deviation of 2 degrees can be fatal and may prevent it from maintaining balance.
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.37]{Gyro meting}
-\caption{measurements gyro sensor.}
+\caption{measurements gyro sensor with no movement.}
 \label{fig:measurements gyro sensor}
 \end{figure}
 
@@ -196,23 +212,46 @@ What I didn't considered at the beginning of this project, in all my enthusiasm,
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.37]{Model Oscilating}
-\caption{Model oscilating to its setpoint(0).}
+\caption{Phisical setup oscilating around its setpoint(0).}
 \label{fig:Model oscilating to its setpoint(0)}
 \end{figure}
 
 \begin{figure}[H]
 \centering
+\includegraphics[scale=0.37]{Swing Up}
+\caption{Phisical setup treis to make a swing up.}
+\label{fig:swing up}
+\end{figure}
+
+I have conducted several measurements of the physical setup. In Figure \ref{fig:Model oscilating to its setpoint(0)}, you can observe how the physical setup oscillates around its setpoint. It struggles to approach the setpoint slowly, likely due to delayed measurements. Furthermore, in Figure \ref{fig:swing up}, you can see the swing-up phase. Once the pendulum is in its initial position, it attempts to swing itself upward by rapidly rotating the reaction wheel in one direction and then the other. This action generates a significant force to lift itself. However, as indicated in the graph, it fails to maintain balance on the setpoint. Consequently, the pendulum tilts over to the other side.
+
+\begin{figure}[H]
+\centering
 \includegraphics[scale=0.37]{Model stepresponse}
-\caption{stepresponse of the model.}
+\caption{stepresponse of the phisical setup.}
 \label{fig:stepresponse of the model}
 \end{figure}
 
 % \cite{deltap}
 
 
-In the step response in figure \ref{fig:stepresponse of the model}, you can see how the pendulum initially reaches its setpoint, then experiences an external force, and struggles to balance back to its setpoint. This is likely due to insufficient precision, and the small margin of error prevents the system from responding quickly enough with accurate measurements. However, what is also noticeable, is that the sensor records very strange values at the end of the falling motion. The pendulum can only fall to an angle of 30 degrees due to a mechanical blockage. In the graph, you can see the sensor registering an angle of almost 45 degrees during the fall, which is impossible. If the sensor frequently produces such incorrect measurements during balancing, I consider it impossible to achieve balance reliably with this sensor.
+In the step response in figure \ref{fig:stepresponse of the model}, you can see how the pendulum initially reaches its setpoint, then experiences an external force, and struggles to balance back to its setpoint. This is likely due to insufficient precision, and the small margin of error prevents the system from responding quickly enough with accurate measurements. However, what is also noticeable, is that the sensor records very strange values at the end of the falling motion. This is visible in figure \ref{fig:stepresponse of the model} and \ref{fig:swing up} The pendulum can only fall to an angle of 30 degrees due to a mechanical blockage. In the graph, you can see the sensor registering an angle of almost 45 degrees during the fall, which is impossible. If the sensor frequently produces such incorrect measurements during balancing, I consider it impossible to achieve balance reliably with this sensor.
+
+\vspace{.5cm}
 
 If we trust the simulation, it should certainly be possible to balance a pendulum with a reaction wheel. We have also seen this in other practical examples on the internet. However, with the challenge of creating a relatively small model on a tight budget and using sensors that are not precise enough, this experiment has shown that achieving this goal is practically not feasible in the way I attempted it.
+
+\subsection{Difference between the simulation and the physical setup}
+
+It's interesting to observe the difference between the simulation and reality. While the model in the simulation works perfectly, the physical setup struggles to remain stable. When comparing graphs \ref{fig:Stepresponse PID controlled simulation Michel} and \ref{fig:Model oscilating to its setpoint(0)}, you can see that the simulation almost comes to a standstill at its setpoint, whereas the physical setup continues to oscillate around it. Clearly, there is a discrepancy, but upon closer inspection, you can notice some similarity in behavior. Unfortunately, the simulation cannot be fully compared to reality due to the following reasons. The simulation does not account for air resistance, and there is no consideration for friction in the pivot point of the pendulum. Additionally, the simulation does not incorporate the motor's properties.
+
+\vspace{.5cm}
+
+In the physical setup, there are several factors that hinder it from matching the simulation perfectly. The sensor provides inaccurate values, the small model allows little room for errors, and cable placement also affects the pendulum as they may "pull" on it if not properly arranged.
+
+\vspace{.5cm}
+
+Addressing all these factors would likely lead to a closer resemblance between the simulation and the physical setup.
 
 \section{Conclusions and recommendations}
 Conclusions:
@@ -228,7 +267,7 @@ Recommendations:
 \item Constructing a sturdier model with less friction at the pivot point.
 \end{itemize}
 
-\end{multicols}
+
 \section{Bibliography}
 \begin{enumerate}
     \item \textbf{YouTube} How to build self balancing Cube \href{https://www.youtube.com/watch?v=AJQZFHJzwt4}{https://www.youtube.com}
@@ -237,8 +276,8 @@ Recommendations:
     \item \textbf{YouTube} A Lesson in Failure: Reaction Wheel PID Tuning \href{https://www.youtube.com/watch?v=kMCPTmi7f-4&list=PLMAbfx2u_zm4uqeRiwqP0UWDNL2hisYsA&index=6&t=721s}{https://www.youtube.com}
     \item \textbf{PDF} Kinematics Proposal.pdf  \href{https://github.com/B-Paweekorn/Reaction-wheel-inverted-pendulum/blob/main/Kinematics%20Proposal.pdf}{Reaction-wheel-inverted-pendulum/blob/main/Kinematics20Proposal.pdf}
     \item \textbf{GitHub} GitHub Remigijus  \href{https://github.com/remrc/}{https://github.com/remrc/}
-    
 \end{enumerate}
+\end{multicols}
 \newpage
 
 %Bibliography
